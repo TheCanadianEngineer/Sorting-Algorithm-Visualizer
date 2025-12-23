@@ -39,8 +39,6 @@ rectScale = height / numAmount
 
 delay = 0 # milliseconds
 
-    ## For Bubble Sort
-
 smallerNum = 0
 biggerNum = 0
 
@@ -77,7 +75,8 @@ def drawScreen(funcName = "Undefined"):
 # Sorting Functions
 
 def bubbleSort():
-    global smallerNum, biggerNum
+    global smallerNum, biggerNum, algName
+    algName = "Bubble Sort"
     n = len(numbers)
 
     for i in range(n - 1):
@@ -94,7 +93,8 @@ def bubbleSort():
 
 
 def selectionSort():
-    global smallerNum, biggerNum
+    global smallerNum, biggerNum, algName
+    algName = "Selection Sort"
     n = len(numbers)
     
     for i in range(n - 1):
@@ -120,8 +120,8 @@ def selectionSort():
 
 
 def insertionSort():
-    global smallerNum, biggerNum
-
+    global smallerNum, biggerNum, algName
+    algName = "Insertion Sort"
     for x in range(1, len(numbers)):
         current = x
         while current > 0 and numbers[current - 1] > numbers[current]:
@@ -129,7 +129,7 @@ def insertionSort():
             biggerNum = numbers[current - 1]
 
             numbers[current], numbers[current - 1] = numbers[current - 1], numbers[current]
-            drawScreen("Insertion Sort")
+            drawScreen(algName)
 
             yield
 
@@ -139,6 +139,7 @@ def insertionSort():
 # Main loop
 running = True
 sort_gen = bubbleSort()
+algName = "Undefined"
 fullyFinished = False
 while running:
     for event in pygame.event.get():
@@ -177,15 +178,10 @@ while running:
         
         try:
             next(sort_gen)  # perform one swap/step
-            drawScreen("Selection Sort")
+            drawScreen(algName)
         except StopIteration:
         # Sorting is done
             drawScreen("Sorted")
-
-    
-
-    # Update display
-    # pygame.display.flip()
 
 pygame.quit()
 sys.exit()
