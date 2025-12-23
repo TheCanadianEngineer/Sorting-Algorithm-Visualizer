@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 800
+numAmount = 1200
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -183,10 +183,35 @@ def quickSort(arr=numbers, start=0, end=None):
     yield from quickSort(arr, start, i - 1)
     yield from quickSort(arr, i + 1, end)
 
+def combSort():
+    global smallerNum, biggerNum, algName
+    algName = "Comb Sort"
+    
+    n = len(numbers)
+
+    gap = n
+    swapped = False
+
+    while gap > 1 or swapped:
+        gap = max(1, int(gap / 1.3))
+        swapped = False
+        for j in range(n  - gap):
+            # Highlight the elements being compared
+            smallerNum = numbers[j + gap]
+            biggerNum = numbers[j]
+            yield  # pause here to show the comparison
+
+            # Swap if out of order
+            if numbers[j] > numbers[j + gap]:
+                numbers[j], numbers[j + gap] = numbers[j + gap], numbers[j]
+                swapped = True
+                yield  # pause here to show the swap
+        
+
 
 # Main loop
 running = True
-sort_gen = quickSort()
+sort_gen = combSort()
 algName = "Undefined"
 fullyFinished = False
 while running:
