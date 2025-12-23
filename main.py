@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 200
+numAmount = 500
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -74,6 +74,9 @@ def textHandler():
 
     text_surface = font.render("Bigger Number", True, RED)
     screen.blit(text_surface, (20, textSpacing * 5))
+
+def get_digit(number, n):
+    return number // 10**n % 10
 
 def play_tone(number, duration=0.2):
     frequency = 200 + number * 10
@@ -230,11 +233,35 @@ def combSort():
                 swapped = True
                 yield  # pause here to show the swap
         
+def radixSort():
+    global numbers, algName
+    algName = "Radix Sort"
+
+    max_digits = len(str(max(numbers)))
+
+    for i in range(max_digits):
+        bucket = []
+
+        for val in numbers:
+            inserted = False
+            for idx, x in enumerate(bucket):
+                if get_digit(val, i) < get_digit(x, i):
+                    bucket.insert(idx, val)  # insert at the correct spot
+                    inserted = True
+                    yield  # yield after inserting into bucket
+                    break
+            if not inserted:
+                bucket.append(val)
+                yield  # yield after appending to bucket
+
+        # After processing all numbers for this digit
+        numbers = bucket.copy()
+        yield  # yield the updated main array after this digit pass
 
 
 # Main loop
 running = True
-sort_gen = quickSort()
+sort_gen = radixSort()
 algName = "Undefined"
 fullyFinished = False
 while running:
