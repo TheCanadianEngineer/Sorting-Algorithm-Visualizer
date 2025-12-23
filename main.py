@@ -7,8 +7,8 @@ import numpy as np
 pygame.init()
 
 # Create a window
-width, height = 1200, 700
-screen = pygame.display.set_mode((width, height))
+screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+width, height = screen.get_size()
 pygame.display.set_caption("Sorting Algorithms")
 
 # Colors (R, G, B)
@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 500
+numAmount = 1200
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -234,7 +234,7 @@ def combSort():
                 yield  # pause here to show the swap
         
 def radixSort():
-    global numbers, algName
+    global numbers, algName, smallerNum, biggerNum
     algName = "Radix Sort"
 
     max_digits = len(str(max(numbers)))
@@ -248,6 +248,8 @@ def radixSort():
                 if get_digit(val, i) < get_digit(x, i):
                     bucket.insert(idx, val)  # insert at the correct spot
                     inserted = True
+                    smallerNum = val
+                    biggerNum = x
                     yield  # yield after inserting into bucket
                     break
             if not inserted:
