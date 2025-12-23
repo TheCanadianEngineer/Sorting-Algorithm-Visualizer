@@ -1,0 +1,191 @@
+import pygame
+import sys
+import random
+import time
+
+# Initialize pygame
+pygame.init()
+
+# Create a window
+width, height = 1200, 700
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Sorting Algorithms")
+
+# Colors (R, G, B)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 120, 255)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+
+# Text
+font = pygame.font.Font(None, 24)  
+# None = default font, 48 = size
+
+
+# List Vars
+
+numAmount = 30
+
+numbers = random.sample(range(1, numAmount + 1), numAmount)
+print(numbers)
+# numbers.sort()
+
+# Graph Vars
+
+rectScale = height / numAmount
+
+# Global Vars
+
+delay = 0 # milliseconds
+
+    ## For Bubble Sort
+
+smallerNum = 0
+biggerNum = 0
+
+# Main Functions
+
+def drawScreen(funcName = "Undefined"):
+    screen.fill(BLACK)
+    numIdx = 0
+
+    # Drawing Rec
+    for x in numbers:
+        if x == smallerNum: 
+            pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
+        elif x == biggerNum:
+            pygame.draw.rect(screen, RED, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
+        else:
+            pygame.draw.rect(screen, WHITE, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
+        numIdx += 1
+
+    # Drawing Text
+    text_surface = font.render(f"Algorithm: {funcName}", True, WHITE)
+    screen.blit(text_surface, (20, 20))
+
+    text_surface = font.render("Smaller Number", True, GREEN)
+    screen.blit(text_surface, (20, 40))
+
+    text_surface = font.render("Bigger Number", True, RED)
+    screen.blit(text_surface, (20, 60))
+
+
+    pygame.display.flip()
+    pygame.time.wait(delay)
+
+# Sorting Functions
+
+def bubbleSort():
+    global smallerNum, biggerNum
+    n = len(numbers)
+
+    for i in range(n - 1):
+        for j in range(n - i - 1):
+            # Highlight the elements being compared
+            smallerNum = numbers[j + 1]
+            biggerNum = numbers[j]
+            yield  # pause here to show the comparison
+
+            # Swap if out of order
+            if numbers[j] > numbers[j + 1]:
+                numbers[j], numbers[j + 1] = numbers[j + 1], numbers[j]
+                yield  # pause here to show the swap
+
+
+def selectionSort():
+    global smallerNum, biggerNum
+    n = len(numbers)
+    
+    for i in range(n - 1):
+        min_idx = i
+        for j in range(i + 1, n):
+            # Highlight the current pair being compared
+            smallerNum = numbers[j]
+            biggerNum = numbers[min_idx]
+            yield  # pause to visualize
+
+            # Update min_idx if a smaller element is found
+            if numbers[j] < numbers[min_idx]:
+                min_idx = j
+                smallerNum = numbers[min_idx]
+                biggerNum = numbers[i]
+                yield  # pause to visualize
+
+        # Swap the found minimum element with the first unsorted element
+        numbers[i], numbers[min_idx] = numbers[min_idx], numbers[i]
+        smallerNum = numbers[i]
+        biggerNum = numbers[min_idx]
+        yield  # pause to visualize
+
+
+def insertionSort():
+    global smallerNum, biggerNum
+
+    for x in range(1, len(numbers)):
+        current = x
+        while current > 0 and numbers[current - 1] > numbers[current]:
+            smallerNum = numbers[current]
+            biggerNum = numbers[current - 1]
+
+            numbers[current], numbers[current - 1] = numbers[current - 1], numbers[current]
+            drawScreen("Insertion Sort")
+
+            yield
+
+            current -= 1  # move left
+    yield
+
+# Main loop
+running = True
+sort_gen = bubbleSort()
+fullyFinished = False
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    numbers2 = numbers.copy()
+    numbers2.sort()
+    if numbers == numbers2 :
+        if  not fullyFinished:
+            numIdx = 0
+            numIdx = 0
+            while numIdx < numAmount:
+                screen.fill(BLACK)
+                for i in range(len(numbers)):
+                    x = numbers[i]
+                    if i < numIdx:
+                        color = GREEN
+                    else:
+                        color = WHITE
+                    pygame.draw.rect(screen, color, ((width / numAmount) * i, height - x * rectScale, width / numAmount, x * rectScale))
+
+                pygame.display.flip()
+                pygame.time.delay(1 * numAmount)  # optional, controls animation speed
+                numIdx += 1
+
+            fullyFinished = True
+        else:
+            screen.fill(BLACK)
+            numIdx = 0
+            for x in numbers:
+                pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
+                numIdx += 1
+            pygame.display.flip()
+    else:
+        
+        try:
+            next(sort_gen)  # perform one swap/step
+            drawScreen("Selection Sort")
+        except StopIteration:
+        # Sorting is done
+            drawScreen("Sorted")
+
+    
+
+    # Update display
+    # pygame.display.flip()
+
+pygame.quit()
+sys.exit()
