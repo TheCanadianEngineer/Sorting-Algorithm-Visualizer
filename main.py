@@ -37,7 +37,7 @@ rectScale = height / numAmount
 
 # Global Vars
 
-delay = 0 # milliseconds
+delay = 100 # milliseconds
 
 smallerNum = 0
 biggerNum = 0
@@ -136,9 +136,42 @@ def insertionSort():
             current -= 1  # move left
     yield
 
+def quickSort(arr=numbers, start=0, end=None):
+    global numbers, smallerNum, biggerNum, algName
+    algName = "Quick Sort"
+
+    if end is None:
+        end = len(arr) - 1
+
+    if start >= end:
+        return
+
+    # Partition
+    pivot = arr[end]
+    biggerNum = pivot
+    i = start
+
+    for j in range(start, end):
+        smallerNum = arr[j]
+        yield  # show comparison
+
+        if arr[j] < pivot:
+            arr[i], arr[j] = arr[j], arr[i]
+            yield  # show swap
+            i += 1
+
+    # Move pivot to correct position
+    arr[i], arr[end] = arr[end], arr[i]
+    yield  # show pivot placement
+
+    # Recursive calls
+    yield from quickSort(arr, start, i - 1)
+    yield from quickSort(arr, i + 1, end)
+
+
 # Main loop
 running = True
-sort_gen = bubbleSort()
+sort_gen = quickSort()
 algName = "Undefined"
 fullyFinished = False
 while running:
