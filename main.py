@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 30
+numAmount = 1000
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -37,7 +37,7 @@ rectScale = height / numAmount
 
 # Global Vars
 
-delay = 100 # milliseconds
+delay = 0 # milliseconds
 
 smallerNum = 0
 biggerNum = 0
@@ -196,7 +196,7 @@ while running:
                     pygame.draw.rect(screen, color, ((width / numAmount) * i, height - x * rectScale, width / numAmount, x * rectScale))
 
                 pygame.display.flip()
-                pygame.time.delay(1 * numAmount)  # optional, controls animation speed
+                pygame.time.delay(int(1000 / numAmount))  # optional, controls animation speed
                 numIdx += 1
 
             fullyFinished = True
