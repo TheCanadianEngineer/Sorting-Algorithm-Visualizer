@@ -74,14 +74,20 @@ def drawScreen(funcName = "Undefined"):
         numIdx += 1
 
     # Drawing Text
+
+    textSpacing = 20
+
     text_surface = font.render(f"Algorithm: {funcName}", True, WHITE)
-    screen.blit(text_surface, (20, 20))
+    screen.blit(text_surface, (20, textSpacing))
+
+    text_surface = font.render(f"Number of elements: {numAmount}", True, WHITE)
+    screen.blit(text_surface, (20, textSpacing * 2))
 
     text_surface = font.render("Smaller Number", True, GREEN)
-    screen.blit(text_surface, (20, 40))
+    screen.blit(text_surface, (20, textSpacing * 3))
 
     text_surface = font.render("Bigger Number", True, RED)
-    screen.blit(text_surface, (20, 60))
+    screen.blit(text_surface, (20, textSpacing * 4))
 
 
     pygame.display.flip()
