@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 1200
+numAmount = 40
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -36,6 +36,8 @@ print(numbers)
 rectScale = height / numAmount
 
 # Global Vars
+
+homeScreen = True
 
 delay = 0 # milliseconds
 
@@ -48,12 +50,15 @@ elapsed_sec = elapsed_ms / 1000
 
 doneSorting = False
 
+algorithms = ["Bubble Sort", "Selection Sort", "Insertion Sort", "Quick Sort", "Comb Sort", "Radix Sort"]
+
 
 # Main Functions
 
 pygame.mixer.init(frequency=44100)
 
 def textHandler():
+    font = pygame.font.Font(None,30)
     global elapsed_ms, elapsed_sec
     textSpacing = 20
     text_surface = font.render(f"Algorithm: {algName}", True, WHITE)
@@ -69,11 +74,14 @@ def textHandler():
     text_surface = font.render(f"Time: {elapsed_sec}", True, WHITE)
     screen.blit(text_surface, (20, textSpacing * 3))
 
-    text_surface = font.render("Smaller Number", True, GREEN)
+    text_surface = font.render(f"Screen Res: {width}, {height}", True, WHITE)
     screen.blit(text_surface, (20, textSpacing * 4))
 
-    text_surface = font.render("Bigger Number", True, RED)
-    screen.blit(text_surface, (20, textSpacing * 5))
+    # text_surface = font.render("Smaller Number", True, GREEN)
+    # screen.blit(text_surface, (20, textSpacing * 4))
+
+    # text_surface = font.render("Bigger Number", True, RED)
+    # screen.blit(text_surface, (20, textSpacing * 5))
 
 def get_digit(number, n):
     return number // 10**n % 10
@@ -270,48 +278,108 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.MOUSEBUTTONDOWN and not homeScreen:
+            running = False
 
-    numbers2 = numbers.copy()
-    numbers2.sort()
-    if numbers == numbers2 :
-        if  not fullyFinished:
-            doneSorting = True
-            numIdx = 0
-            while numIdx < numAmount:
-                screen.fill(BLACK)
-                textHandler()
-                for i in range(len(numbers)):
-                    x = numbers[i]
-                    if i < numIdx:
-                        color = GREEN
-                    else:
-                        color = WHITE
-                    if numIdx == numbers[i - 1]:
-                        play_tone(numbers[i - 1])
-                        print(numbers[i-1], i)
-                    pygame.draw.rect(screen, color, ((width / numAmount) * i, height - x * rectScale, width / numAmount, x * rectScale))
+    if homeScreen:
+        screen.fill(BLACK)
+        recSpacing = 40
+        recX = 600
+        recY = 60
+        mouse_pos = pygame.mouse.get_pos()
 
-                pygame.display.flip()
-                pygame.time.delay(int(1000 / numAmount))  # optional, controls animation speed
-                numIdx += 1
+        for i, alg in enumerate(algorithms):
+            font = pygame.font.Font(None, 60)
 
-            fullyFinished = True
-        else:
-            screen.fill(BLACK)
-            numIdx = 0
-            textHandler()
-            for x in numbers:
-                pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
-                numIdx += 1
-            pygame.display.flip()
+            # Rectangle position
+            rect_x = recSpacing
+            rect_y = (recSpacing * (1 + i)) + (recY * i)
+            rect = pygame.Rect(rect_x, rect_y, recX, recY)
+
+            # Hover effect
+            if rect.collidepoint(mouse_pos):
+                color = RED  # highlight on hover
+            else:
+                color = WHITE
+
+            # Draw rectangle
+            pygame.draw.rect(screen, color, rect, 5)
+
+            # Draw centered text
+            text_surface = font.render(alg, True, color)
+            text_rect = text_surface.get_rect(center=rect.center)
+            screen.blit(text_surface, text_rect)
+
+        pygame.display.flip()
+
+        # Handle clicks
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                for i, alg in enumerate(algorithms):
+                    rect_x = recSpacing
+                    rect_y = (recSpacing * (1 + i)) + (recY * i)
+                    rect = pygame.Rect(rect_x, rect_y, recX, recY)
+                    if rect.collidepoint(event.pos):
+                        homeScreen = False
+                        algName = alg
+                        # Initialize the correct sorting generator
+                        if algName == "Bubble Sort":
+                            sort_gen = bubbleSort()
+                        elif algName == "Selection Sort":
+                            sort_gen = selectionSort()
+                        elif algName == "Insertion Sort":
+                            sort_gen = insertionSort()
+                        elif algName == "Quick Sort":
+                            sort_gen = quickSort()
+                        elif algName == "Comb Sort":
+                            sort_gen = combSort()
+                        elif algName == "Radix Sort":
+                            sort_gen = radixSort()
+
     else:
-        
-        try:
-            next(sort_gen)  # perform one swap/step
-            drawScreen(algName)
-        except StopIteration:
-        # Sorting is done
-            drawScreen("Sorted")
+        numbers2 = numbers.copy()
+        numbers2.sort()
+        if numbers == numbers2 :
+            if  not fullyFinished:
+                doneSorting = True
+                numIdx = 0
+                while numIdx < numAmount:
+                    screen.fill(BLACK)
+                    textHandler()
+                    for i in range(len(numbers)):
+                        x = numbers[i]
+                        if i < numIdx:
+                            color = GREEN
+                        else:
+                            color = WHITE
+                        if numIdx == numbers[i - 1]:
+                            play_tone(numbers[i - 1])
+                            print(numbers[i-1], i)
+                        pygame.draw.rect(screen, color, ((width / numAmount) * i, height - x * rectScale, width / numAmount, x * rectScale))
+
+                    pygame.display.flip()
+                    pygame.time.delay(int(1000 / numAmount))  # optional, controls animation speed
+                    numIdx += 1
+
+                fullyFinished = True
+            else:
+                screen.fill(BLACK)
+                numIdx = 0
+                textHandler()
+                for x in numbers:
+                    pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
+                    numIdx += 1
+                pygame.display.flip()
+        else:
+            
+            try:
+                next(sort_gen)  # perform one swap/step
+                drawScreen(algName)
+            except StopIteration:
+            # Sorting is done
+                drawScreen("Sorted")
 
 pygame.quit()
 sys.exit()
