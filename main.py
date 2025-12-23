@@ -1,7 +1,7 @@
 import pygame
 import sys
 import random
-import time
+import numpy as np
 
 # Initialize pygame
 pygame.init()
@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 1000
+numAmount = 800
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -44,6 +44,20 @@ biggerNum = 0
 
 # Main Functions
 
+pygame.mixer.init(frequency=44100)
+
+def play_tone(number, duration=0.2):
+    frequency = 200 + number * 10
+    sample_rate = 44100
+    t = np.linspace(0, duration, int(sample_rate * duration), False)
+    wave = np.sin(frequency * t * 2 * np.pi)
+    sound = np.int16(wave * 32767)
+
+    # Convert numpy array to bytes
+    sound_bytes = sound.tobytes()
+    snd = pygame.mixer.Sound(buffer=sound_bytes)
+    snd.play()
+
 def drawScreen(funcName = "Undefined"):
     screen.fill(BLACK)
     numIdx = 0
@@ -51,6 +65,7 @@ def drawScreen(funcName = "Undefined"):
     # Drawing Rec
     for x in numbers:
         if x == smallerNum: 
+            play_tone(x)
             pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
         elif x == biggerNum:
             pygame.draw.rect(screen, RED, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
@@ -184,7 +199,6 @@ while running:
     if numbers == numbers2 :
         if  not fullyFinished:
             numIdx = 0
-            numIdx = 0
             while numIdx < numAmount:
                 screen.fill(BLACK)
                 for i in range(len(numbers)):
@@ -193,6 +207,9 @@ while running:
                         color = GREEN
                     else:
                         color = WHITE
+                    if numIdx == numbers[i - 1]:
+                        play_tone(numbers[i - 1])
+                        print(numbers[i-1], i)
                     pygame.draw.rect(screen, color, ((width / numAmount) * i, height - x * rectScale, width / numAmount, x * rectScale))
 
                 pygame.display.flip()
