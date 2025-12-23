@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 1200
+numAmount = 200
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -42,9 +42,38 @@ delay = 0 # milliseconds
 smallerNum = 0
 biggerNum = 0
 
+start_time = pygame.time.get_ticks()
+elapsed_ms = pygame.time.get_ticks() - start_time
+elapsed_sec = elapsed_ms / 1000
+
+doneSorting = False
+
+
 # Main Functions
 
 pygame.mixer.init(frequency=44100)
+
+def textHandler():
+    global elapsed_ms, elapsed_sec
+    textSpacing = 20
+    text_surface = font.render(f"Algorithm: {algName}", True, WHITE)
+    screen.blit(text_surface, (20, textSpacing))
+
+    text_surface = font.render(f"Number of elements: {numAmount}", True, WHITE)
+    screen.blit(text_surface, (20, textSpacing * 2))
+
+    if not doneSorting:
+        elapsed_ms = pygame.time.get_ticks() - start_time
+        elapsed_sec = elapsed_ms / 1000
+
+    text_surface = font.render(f"Time: {elapsed_sec}", True, WHITE)
+    screen.blit(text_surface, (20, textSpacing * 3))
+
+    text_surface = font.render("Smaller Number", True, GREEN)
+    screen.blit(text_surface, (20, textSpacing * 4))
+
+    text_surface = font.render("Bigger Number", True, RED)
+    screen.blit(text_surface, (20, textSpacing * 5))
 
 def play_tone(number, duration=0.2):
     frequency = 200 + number * 10
@@ -75,19 +104,7 @@ def drawScreen(funcName = "Undefined"):
 
     # Drawing Text
 
-    textSpacing = 20
-
-    text_surface = font.render(f"Algorithm: {funcName}", True, WHITE)
-    screen.blit(text_surface, (20, textSpacing))
-
-    text_surface = font.render(f"Number of elements: {numAmount}", True, WHITE)
-    screen.blit(text_surface, (20, textSpacing * 2))
-
-    text_surface = font.render("Smaller Number", True, GREEN)
-    screen.blit(text_surface, (20, textSpacing * 3))
-
-    text_surface = font.render("Bigger Number", True, RED)
-    screen.blit(text_surface, (20, textSpacing * 4))
+    textHandler()
 
 
     pygame.display.flip()
@@ -217,7 +234,7 @@ def combSort():
 
 # Main loop
 running = True
-sort_gen = combSort()
+sort_gen = quickSort()
 algName = "Undefined"
 fullyFinished = False
 while running:
@@ -229,9 +246,11 @@ while running:
     numbers2.sort()
     if numbers == numbers2 :
         if  not fullyFinished:
+            doneSorting = True
             numIdx = 0
             while numIdx < numAmount:
                 screen.fill(BLACK)
+                textHandler()
                 for i in range(len(numbers)):
                     x = numbers[i]
                     if i < numIdx:
@@ -251,6 +270,7 @@ while running:
         else:
             screen.fill(BLACK)
             numIdx = 0
+            textHandler()
             for x in numbers:
                 pygame.draw.rect(screen, GREEN, ((width / numAmount) * numIdx, height - x * rectScale, width / numAmount, x * rectScale))
                 numIdx += 1
