@@ -25,7 +25,7 @@ font = pygame.font.Font(None, 24)
 
 # List Vars
 
-numAmount = 40
+numAmount = int(1434 / 10)
 
 numbers = random.sample(range(1, numAmount + 1), numAmount)
 print(numbers)
@@ -188,34 +188,34 @@ def insertionSort():
 def quickSort(arr=numbers, start=0, end=None):
     global numbers, smallerNum, biggerNum, algName
     algName = "Quick Sort"
-
+    newArr = numbers
     if end is None:
-        end = len(arr) - 1
+        end = len(newArr) - 1
 
     if start >= end:
         return
 
     # Partition
-    pivot = arr[end]
+    pivot = newArr[end]
     biggerNum = pivot
     i = start
 
     for j in range(start, end):
-        smallerNum = arr[j]
+        smallerNum = newArr[j]
         yield  # show comparison
 
-        if arr[j] < pivot:
-            arr[i], arr[j] = arr[j], arr[i]
+        if newArr[j] < pivot:
+            newArr[i], newArr[j] = newArr[j], newArr[i]
             yield  # show swap
             i += 1
 
     # Move pivot to correct position
-    arr[i], arr[end] = arr[end], arr[i]
+    newArr[i], newArr[end] = newArr[end], newArr[i]
     yield  # show pivot placement
 
     # Recursive calls
-    yield from quickSort(arr, start, i - 1)
-    yield from quickSort(arr, i + 1, end)
+    yield from quickSort(newArr, start, i - 1)
+    yield from quickSort(newArr, i + 1, end)
 
 def combSort():
     global smallerNum, biggerNum, algName
@@ -279,7 +279,12 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.MOUSEBUTTONDOWN and not homeScreen:
-            running = False
+            numbers = random.sample(range(1, numAmount + 1), numAmount)
+            homeScreen = True
+            fullyFinished = False
+            doneSorting = False
+            start_time = pygame.time.get_ticks()
+
 
     if homeScreen:
         screen.fill(BLACK)
